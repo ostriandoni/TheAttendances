@@ -1,0 +1,79 @@
+extends layout
+
+block content
+  script.
+    function showTime(){
+      var date = new Date();
+      var h = date.getHours(); // 0 - 23
+      var m = date.getMinutes(); // 0 - 59
+      var s = date.getSeconds(); // 0 - 59
+      var session = "AM";
+      
+      if(h == 0){
+          h = 12;
+      }
+      
+      if(h > 12){
+          h = h - 12;
+          session = "PM";
+      }
+      
+      h = (h < 10) ? "0" + h : h;
+      m = (m < 10) ? "0" + m : m;
+      s = (s < 10) ? "0" + s : s;
+      
+      var time = h + ":" + m + ":" + s + " " + session;
+      document.getElementsByClassName("clock").innerText = time;
+      document.getElementsByClassName("clock").textContent = time;
+      
+      setTimeout(showTime, 1000);
+    }
+    showTime()
+
+  if user
+    h1.text-center Dashboard
+      p.lead.text-center Selamat datang, #{user.profile.name}!
+    hr
+    .row
+      .col-md-3.text-center
+        h2 Total Kehadiran
+        p 90%
+        p
+          a.btn.btn-raised(href='/detail', role='button') Lihat Detail
+      .col-md-6.text-center
+        h2 #{clock}
+        div.clock(onload='showTime()')
+        p #{day}
+        p
+          a.btn.btn-raised(href='#', role='button') Absen Sekarang
+        p Clock In
+        p Clock Out
+      .col-md-3.text-center
+        h2 Cuti Tahunan
+        p 10 hari
+        p
+          a.btn.btn-raised(href='#', role='button') Request Cuti
+      //- .col-md-6
+      //-   h2 Heading
+      //-   p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+      //-   p
+      //-     a.btn.btn-raised(href='#', role='button') View details »
+  else
+    .pb-2.mt-2.mb-4.border-bottom
+      h3 Sign in
+    form(action='/login' method='POST')
+      input(type='hidden', name='_csrf', value=_csrf)
+      .form-group.row
+        label.col-md-3.col-form-label.font-weight-bold.text-right(for='email') Email
+        .col-md-7
+          input.form-control(type='email', name='email', id='email', placeholder='Email', autofocus, autocomplete='email', required)
+      .form-group.row
+        label.col-md-3.col-form-label.font-weight-bold.text-right(for='password') Password
+        .col-md-7
+          input.form-control(type='password', name='password', id='password', placeholder='Password', autocomplete='current-password', required)
+      .form-group
+        .offset-md-3.col-md-7.pl-2
+          button.col-md-3.btn.btn-primary(type='submit')
+            i.far.fa-user.fa-sm
+            | Login
+          a.btn.btn-link(href='/forgot') Forgot your password?

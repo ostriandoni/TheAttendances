@@ -5,7 +5,7 @@ const express = require('express');
 const compression = require('compression');
 const session = require('express-session');
 const bodyParser = require('body-parser');
-// const logger = require('morgan');
+const logger = require('morgan');
 const chalk = require('chalk');
 const errorHandler = require('errorhandler');
 const lusca = require('lusca');
@@ -66,7 +66,7 @@ app.use(sass({
   src: path.join(__dirname, 'public'),
   dest: path.join(__dirname, 'public'),
 }));
-// app.use(logger('dev'));
+app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({

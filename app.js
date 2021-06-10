@@ -20,13 +20,13 @@ const sass = require('node-sass-middleware');
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
-dotenv.config({ path: '.env.example' });
+dotenv.config({ path: '.env' });
 
 /**
  * Controllers (route handlers).
  */
 const homeController = require('./controllers/home');
-const detailController = require('./controllers/detail');
+const historyController = require('./controllers/history');
 const userController = require('./controllers/user');
 
 /**
@@ -143,7 +143,7 @@ app.use('/webfonts',
 app.get('/', homeController.index);
 app.post('/clockin', passportConfig.isAuthenticated, homeController.postClockIn);
 app.post('/clockout', passportConfig.isAuthenticated, homeController.postClockOut);
-app.get('/detail', passportConfig.isAuthenticated, detailController.index);
+app.get('/history', passportConfig.isAuthenticated, historyController.index);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);

@@ -1,4 +1,7 @@
 # TheAttendances
+
+[![forthebadge](https://forthebadge.com/images/badges/works-on-my-machine.svg)](https://forthebadge.com)
+
 Time and attendance systems are used to track and monitor when employees start and stop work. A time and attendance system enables an employer to monitor their employees working hours and late arrivals, early departures, time taken on breaks and absenteeism.
 
 ## Getting Started

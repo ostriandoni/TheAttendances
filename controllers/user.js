@@ -153,6 +153,7 @@ exports.postSignup = (req, res, next) => {
   const user = new User({
     email: req.body.email,
     password: req.body.password,
+    isAdmin: false
   });
 
   User.findOne({ email: req.body.email }, (err, existingUser) => {
@@ -176,6 +177,12 @@ exports.postSignup = (req, res, next) => {
         res.redirect('/');
       });
     });
+  });
+};
+
+exports.getAccountCrud = (req, res) => {
+  res.render('account/crud', {
+    title: 'Admin Account Management',
   });
 };
 
@@ -213,8 +220,9 @@ exports.postUpdateProfile = (req, res, next) => {
     user.email = req.body.email || '';
     user.profile.name = req.body.name || '';
     user.profile.gender = req.body.gender || '';
-    user.profile.location = req.body.location || '';
-    user.profile.website = req.body.website || '';
+    user.profile.address = req.body.address || '';
+    user.profile.department = req.body.department || '';
+    user.profile.position = req.body.position || '';
     user.save((err) => {
       if (err) {
         if (err.code === 11000) {

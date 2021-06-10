@@ -39,15 +39,32 @@ block content
         h2 Total Kehadiran
         p 90%
         p
-          a.btn.btn-raised(href='/detail', role='button') Lihat Detail
+          a.btn.btn-raised(href='/detail', role='button') Lihat History
       .col-md-6.text-center
         h2 #{clock}
         div.clock(onload='showTime()')
         p #{day}
-        p
-          a.btn.btn-raised(href='#', role='button') Absen Sekarang
-        p Clock In
-        p Clock Out
+        .row.d-flex.justify-content-center
+          .col-md-auto
+            form(action='/clockin', method='POST')
+              input(type='hidden', name='_csrf', value=_csrf)
+              button.btn.btn-primary(type='submit' disabled=clockIn ? 'disabled' : undefined)
+                i.fas.fa-sign-in-alt
+                | Clock In
+          .col-md-auto
+            form(action='/clockout', method='POST')
+              input(type='hidden', name='_csrf', value=_csrf)
+              button.btn.btn-primary(type='submit' disabled=clockOut ? 'disabled' : undefined)
+                i.fas.fa-sign-out-alt
+                | Clock Out
+        if clockIn
+          p Clock In #{clockIn}
+        else
+          p Clock In -
+        if clockOut
+          p Clock Out #{clockOut}
+        else
+          p Clock Out -
       .col-md-3.text-center
         h2 Cuti Tahunan
         p 10 hari

@@ -1,11 +1,7 @@
 const moment = require('moment');
 const User = require('../models/User');
 const Attendance = require('../models/Attendance');
-
-const CLOCK_IN = 'clock in';
-const CLOCK_OUT = 'clock out';
-const FORMAT_DATE = 'YYYY-MM-DD';
-const FORMAT_TIME = 'hh:mm:ss a';
+const constants = require('../config/constants');
 
 exports.index = async (req, res, next) => {
   if (req.user && req.user.id) {
@@ -20,21 +16,21 @@ exports.index = async (req, res, next) => {
       };
       const clockIn = await Attendance.findOne({
         userId: req.user.id,
-        scheduleDate: moment().format(FORMAT_DATE),
-        clockType: CLOCK_IN
+        scheduleDate: moment().format(constants.FORMAT_DATE),
+        clockType: constants.CLOCK_IN
       });
       const clockOut = await Attendance.findOne({
         userId: req.user.id,
-        scheduleDate: moment().format(FORMAT_DATE),
-        clockType: CLOCK_OUT
+        scheduleDate: moment().format(constants.FORMAT_DATE),
+        clockType: constants.CLOCK_OUT
       });
       res.render('home', {
         title: 'Home',
         clock: now.toLocaleTimeString(),
         day: now.toLocaleDateString('id-ID', options),
         user,
-        clockIn: clockIn ? moment(clockIn.clockAt).format(FORMAT_TIME) : null,
-        clockOut: clockOut ? moment(clockOut.clockAt).format(FORMAT_TIME) : null
+        clockIn: clockIn ? moment(clockIn.clockAt).format(constants.FORMAT_TIME) : null,
+        clockOut: clockOut ? moment(clockOut.clockAt).format(constants.FORMAT_TIME) : null
       });
     } catch (error) {
       return next(error);
@@ -49,9 +45,9 @@ exports.index = async (req, res, next) => {
 exports.postClockIn = async (req, res, next) => {
   const attendance = new Attendance({
     userId: req.user.id,
-    scheduleDate: moment().format(FORMAT_DATE),
+    scheduleDate: moment().format(constants.FORMAT_DATE),
     clockAt: moment(),
-    clockType: CLOCK_IN
+    clockType: constants.CLOCK_IN
   });
 
   try {
@@ -66,9 +62,9 @@ exports.postClockIn = async (req, res, next) => {
 exports.postClockOut = async (req, res, next) => {
   const attendance = new Attendance({
     userId: req.user.id,
-    scheduleDate: moment().format(FORMAT_DATE),
+    scheduleDate: moment().format(constants.FORMAT_DATE),
     clockAt: moment(),
-    clockType: CLOCK_OUT,
+    clockType: constants.CLOCK_OUT,
   });
 
   try {

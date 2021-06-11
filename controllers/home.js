@@ -1,4 +1,4 @@
-const moment = require('moment');
+const moment = require('moment-timezone');
 const User = require('../models/User');
 const Attendance = require('../models/Attendance');
 const AttendanceController = require('./attendance');
@@ -9,13 +9,7 @@ exports.index = async (req, res, next) => {
     try {
       const userId = req.user.id;
       const user = await User.findById(userId);
-      const now = new Date();
-      const options = {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      };
+      const now = moment().tz(constants.LOCALE_TZ);
       const clockIn = await Attendance.findOne({
         userId,
         scheduleDate: moment().format(constants.FORMAT_DATE),
@@ -32,8 +26,8 @@ exports.index = async (req, res, next) => {
       });
       res.render('home', {
         title: 'Home',
-        clock: now.toLocaleTimeString(),
-        day: now.toLocaleDateString('id-ID', options),
+        clock: now.format(constants.FORMAT_TIME),
+        day: now.locale(constants.LOCALE_ID).format(constants.FORMAT_LOCALE_DAY),
         user,
         clockIn: clockIn ? moment(clockIn.clockInAt).format(constants.FORMAT_TIME) : null,
         clockOut: clockOut ? moment(clockOut.clockOutAt).format(constants.FORMAT_TIME) : null,

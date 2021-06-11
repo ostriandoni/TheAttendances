@@ -8,7 +8,9 @@ constants.FORMAT_MONTH_PAD = 'MM';
 constants.FORMAT_MONTH_SHORT = 'M';
 constants.FORMAT_DAY_NUM = 'E';
 constants.FORMAT_DAY_NAME = 'dddd';
+constants.FORMAT_LOCALE_DAY = 'dddd, DD MMMM YYYY';
 constants.FORMAT_TIME = 'hh:mm:ss A';
 constants.LOCALE_ID = 'id';
+constants.LOCALE_TZ = 'Asia/Jakarta';
 
 module.exports = constants;

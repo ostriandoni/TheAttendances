@@ -7,44 +7,53 @@ block content
     hr
     .row
       .col-md-3.text-center
-        h2 Total Kehadiran
-        p #{totalAttendance}%
-        p
-          a.btn.btn-raised(href='/history', role='button')
-            i.fas.fa-history
-            | History
-      .col-md-6.text-center
-        h2 #{clock}
-        div.clock(onload='showTime()')
-        p #{day}
-        .row.d-flex.justify-content-center
-          .col-md-auto
-            form(action='/clockin', method='POST')
-              input(type='hidden', name='_csrf', value=_csrf)
-              button.btn.btn-primary(type='submit' disabled=clockIn ? 'disabled' : undefined)
-                i.fas.fa-sign-in-alt
-                | Clock In
-          .col-md-auto
-            form(action='/clockout', method='POST')
-              input(type='hidden', name='_csrf', value=_csrf)
-              button.btn.btn-primary(type='submit' disabled=clockOut ? 'disabled' : undefined)
-                i.fas.fa-sign-out-alt
-                | Clock Out
-        if clockIn
-          p Clock In #{clockIn}
-        else
-          p Clock In -
-        if clockOut
-          p Clock Out #{clockOut}
-        else
-          p Clock Out -
+        .card.text-center
+          .card-header
+            | Total Kehadiran
+          .card-body
+            h5.card-title #{totalAttendance}%
+            p.card-text
+            a.btn.btn-raised(href='/history', role='button')
+              i.fas.fa-history
+              | History
+      .col-md-6
+        .card.text-center
+          .card-header
+            | #{day}
+          .card-body
+            h5.card-title #{clock}
+            p.card-text.font-weight-bold Attendance Log
+            if clockIn
+              p.card-text Clock In #{clockIn}
+            else
+              p.card-text Clock In -
+            if clockOut
+              p.card-text Clock Out #{clockOut}
+            else
+              p.card-text Clock Out -
+            .row
+              .col
+                form(action='/clockin', method='POST')
+                  input(type='hidden', name='_csrf', value=_csrf)
+                  button.btn.btn-primary.btn-block(type='submit' disabled=clockIn ? 'disabled' : undefined)
+                    i.fas.fa-sign-in-alt
+                    | Clock In
+              .col
+                form(action='/clockout', method='POST')
+                  input(type='hidden', name='_csrf', value=_csrf)
+                  button.btn.btn-primary.btn-block(type='submit' disabled=clockOut ? 'disabled' : undefined)
+                    i.fas.fa-sign-out-alt
+                    | Clock Out
       .col-md-3.text-center
-        h2 Cuti Tahunan
-        p 10 hari
-        p
-          a.btn.btn-raised(href='#', role='button') 
-            i.fas.fa-umbrella-beach
-            | Request Cuti
+        .card.text-center
+          .card-header
+            | Cuti Tahunan
+          .card-body
+            h5.card-title 10 hari
+            p.card-text
+            a.btn.btn-raised(href='#', role='button')
+              i.fas.fa-umbrella-beach
+              | Request Cuti
   else
     .pb-2.mt-2.mb-4.border-bottom
       h3 Sign in

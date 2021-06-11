@@ -1,7 +1,5 @@
 const constants = {};
 
-constants.CLOCK_IN = 'clock in';
-constants.CLOCK_OUT = 'clock out';
 constants.FORMAT_DATE = 'YYYY-MM-DD';
 constants.FORMAT_YEARMONTH = 'YYYY-MM';
 constants.FORMAT_YEAR = 'YYYY';

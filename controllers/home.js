@@ -1,12 +1,14 @@
 const moment = require('moment');
 const User = require('../models/User');
 const Attendance = require('../models/Attendance');
+const AttendanceController = require('./attendance');
 const constants = require('../config/constants');
 
 exports.index = async (req, res, next) => {
   if (req.user && req.user.id) {
     try {
-      const user = await User.findById(req.user.id);
+      const userId = req.user.id;
+      const user = await User.findById(userId);
       const now = new Date();
       const options = {
         weekday: 'long',
@@ -15,22 +17,27 @@ exports.index = async (req, res, next) => {
         day: 'numeric'
       };
       const clockIn = await Attendance.findOne({
-        userId: req.user.id,
+        userId,
         scheduleDate: moment().format(constants.FORMAT_DATE),
-        clockType: constants.CLOCK_IN
+        clockInAt: { $ne: null }
       });
       const clockOut = await Attendance.findOne({
-        userId: req.user.id,
+        userId,
         scheduleDate: moment().format(constants.FORMAT_DATE),
-        clockType: constants.CLOCK_OUT
+        clockOutAt: { $ne: null }
+      });
+      const totalAttendance = await AttendanceController.calculateTotalAttendance({
+        userId,
+        monthYear: moment().format(constants.FORMAT_YEARMONTH)
       });
       res.render('home', {
         title: 'Home',
         clock: now.toLocaleTimeString(),
         day: now.toLocaleDateString('id-ID', options),
         user,
-        clockIn: clockIn ? moment(clockIn.clockAt).format(constants.FORMAT_TIME) : null,
-        clockOut: clockOut ? moment(clockOut.clockAt).format(constants.FORMAT_TIME) : null
+        clockIn: clockIn ? moment(clockIn.clockInAt).format(constants.FORMAT_TIME) : null,
+        clockOut: clockOut ? moment(clockOut.clockOutAt).format(constants.FORMAT_TIME) : null,
+        totalAttendance
       });
     } catch (error) {
       return next(error);
@@ -43,15 +50,26 @@ exports.index = async (req, res, next) => {
 };
 
 exports.postClockIn = async (req, res, next) => {
-  const attendance = new Attendance({
+  const searchCriteria = {
     userId: req.user.id,
-    scheduleDate: moment().format(constants.FORMAT_DATE),
-    clockAt: moment(),
-    clockType: constants.CLOCK_IN
-  });
+    scheduleDate: moment().format(constants.FORMAT_DATE)
+  };
+  let attendance = await Attendance.findOne(searchCriteria);
 
   try {
-    await attendance.save();
+    if (attendance) {
+      await Attendance.updateOne(searchCriteria, {
+        clockInAt: moment()
+      });
+    } else {
+      attendance = new Attendance({
+        userId: req.user.id,
+        scheduleDate: moment().format(constants.FORMAT_DATE),
+        clockInAt: moment()
+      });
+      await attendance.save();
+    }
+
     req.flash('success', { msg: 'Success clock in.' });
     res.redirect('/');
   } catch (error) {
@@ -60,15 +78,26 @@ exports.postClockIn = async (req, res, next) => {
 };
 
 exports.postClockOut = async (req, res, next) => {
-  const attendance = new Attendance({
+  const searchCriteria = {
     userId: req.user.id,
-    scheduleDate: moment().format(constants.FORMAT_DATE),
-    clockAt: moment(),
-    clockType: constants.CLOCK_OUT,
-  });
+    scheduleDate: moment().format(constants.FORMAT_DATE)
+  };
+  let attendance = await Attendance.findOne(searchCriteria);
 
   try {
-    await attendance.save();
+    if (attendance) {
+      await Attendance.updateOne(searchCriteria, {
+        clockOutAt: moment()
+      });
+    } else {
+      attendance = new Attendance({
+        userId: req.user.id,
+        scheduleDate: moment().format(constants.FORMAT_DATE),
+        clockOutAt: moment()
+      });
+      await attendance.save();
+    }
+
     req.flash('success', { msg: 'Success clock out.' });
     res.redirect('/');
   } catch (error) {

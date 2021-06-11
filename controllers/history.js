@@ -3,6 +3,7 @@ const moment = require('moment');
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const Attendance = require('../models/Attendance');
+const AttendanceController = require('./attendance');
 const constants = require('../config/constants');
 
 exports.index = async (req, res, next) => {
@@ -38,15 +39,11 @@ exports.index = async (req, res, next) => {
     }
 
     _.reduce(logs, (result, value) => {
-      const temp1 = _.find(attendances, (attendance) =>
-        moment(attendance.scheduleDate).format(constants.FORMAT_DATE) === value.attendance_date
-        && attendance.clockType === constants.CLOCK_IN);
-      const temp2 = _.find(attendances, (attendance) =>
-        moment(attendance.scheduleDate).format(constants.FORMAT_DATE) === value.attendance_date
-        && attendance.clockType === constants.CLOCK_OUT);
-      value.clock_in = temp1 ? moment(temp1.clockAt).format(constants.FORMAT_TIME) : null;
-      value.clock_out = temp2 ? moment(temp2.clockAt).format(constants.FORMAT_TIME) : null;
-      value.remarks = temp1 || temp2 ? 'Hadir' : 'Tanpa keterangan';
+      const temp = _.find(attendances, (attendance) =>
+        moment(attendance.scheduleDate).format(constants.FORMAT_DATE) === value.attendance_date);
+      value.clock_in = temp ? moment(temp.clockInAt).format(constants.FORMAT_TIME) : null;
+      value.clock_out = temp ? moment(temp.clockOutAt).format(constants.FORMAT_TIME) : null;
+      value.remarks = temp || temp ? 'Hadir' : 'Tanpa keterangan';
 
       if (moment().isBefore(value.attendance_date)) {
         value.remarks = null;
@@ -59,6 +56,11 @@ exports.index = async (req, res, next) => {
       return result;
     }, {});
 
+    const totalAttendance = await AttendanceController.calculateTotalAttendance({
+      userId: user.id,
+      monthYear: moment(`${selectedMonthYear}-01`).format(constants.FORMAT_YEARMONTH)
+    });
+
     res.render('history', {
       title: 'History',
       schedule: {
@@ -67,7 +69,8 @@ exports.index = async (req, res, next) => {
         monthNum: query && query.month ? query.month : moment().format(constants.FORMAT_MONTH_PAD)
       },
       user,
-      logs
+      logs,
+      totalAttendance
     });
   } catch (error) {
     return next(error);

@@ -15,6 +15,9 @@ git clone https://github.com/ostriandoni/TheAttendances.git myproject
 # Change directory
 cd myproject
 
+# Copy config vars file and update as necessary
+cp .env.example .env
+
 # Install NPM dependencies
 npm install
 

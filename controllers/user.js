@@ -180,8 +180,8 @@ exports.postSignup = (req, res, next) => {
   });
 };
 
-exports.getAccountCrud = (req, res) => {
-  res.render('account/crud', {
+exports.getAllEmployees = (req, res) => {
+  res.render('account/employees', {
     title: 'Admin Account Management',
   });
 };

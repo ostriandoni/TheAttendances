@@ -16,7 +16,7 @@
         //-   a.nav-link(href='/contact') Contact
         if user && user.isAdmin
           li.nav-item(class=(title === 'Contact') ? 'active' : undefined)
-            a.nav-link(href='/account/crud') All Employees
+            a.nav-link(href='/account/employees') All Employees
       ul.nav.navbar-nav.ml-auto
         if !user
           li.nav-item(class=(title === 'Login') ? 'active' : undefined)

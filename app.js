@@ -28,6 +28,7 @@ dotenv.config({ path: '.env' });
 const homeController = require('./controllers/home');
 const historyController = require('./controllers/history');
 const userController = require('./controllers/user');
+const employeeController = require('./controllers/employee');
 
 /**
  * API keys and Passport configuration.
@@ -151,11 +152,13 @@ app.post('/signup', userController.postSignup);
 app.get('/account/verify', passportConfig.isAuthenticated, userController.getVerifyEmail);
 app.get('/account/verify/:token', passportConfig.isAuthenticated, userController.getVerifyEmailToken);
 app.get('/account', passportConfig.isAuthenticated, userController.getAccount);
-app.get('/account/employees', passportConfig.isAuthenticated, userController.getAllEmployees);
 app.post('/account/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
+app.get('/employees', passportConfig.isAuthenticated, employeeController.getAllEmployees);
+app.get('/employees/:id', passportConfig.isAuthenticated, employeeController.getEmployeeById);
+app.post('/employees/:id', passportConfig.isAuthenticated, employeeController.editEmployeeById);
 
 /**
  * Error Handler.

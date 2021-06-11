@@ -1,0 +1,37 @@
+extends layout
+
+block content
+  .pb-2.mt-2.mb-4.border-bottom
+    h3.text-center All Employees
+
+  .row
+    .col
+      table.table.table-paginate.table-hover
+        thead
+          tr
+            th(scope='col') #
+            th(scope='col') Name
+            th(scope='col') Email
+            th(scope='col') Department
+            th(scope='col') Position
+            th(scope='col') Salary
+            th(scope='col') Is Admin
+            th(scope='col') Is Active
+            th(scope='col') Action
+        tbody
+          for user in users
+            tr
+              th(scope='row')= user.idx
+              td= user.profile.name
+              td= user.email
+              td= user.profile.department
+              td= user.profile.position
+              td= user.profile.salary
+              td
+                input(type='checkbox', checked=user.isAdmin ? 'checked' : undefined, readonly)
+              td
+                input(type='checkbox', checked=user.isActive ? 'checked' : undefined, readonly)
+              td
+                a.btn.btn-primary.btn-sm(href=`/employees/${user.id}`, role='button')
+                  i.fas.fa-pencil-alt
+                  | Edit

@@ -10,7 +10,7 @@
       ul.nav.navbar-nav
         if user && user.isAdmin
           li.nav-item(class=(title === 'All Employees') ? 'active' : undefined)
-            a.nav-link(href='/account/employees') All Employees
+            a.nav-link(href='/employees') All Employees
       ul.nav.navbar-nav.ml-auto
         if !user
           li.nav-item(class=(title === 'Login') ? 'active' : undefined)

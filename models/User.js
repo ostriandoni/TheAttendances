@@ -9,16 +9,15 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: Date,
   emailVerificationToken: String,
   emailVerified: Boolean,
-  isDeactivated: Boolean,
+  isActive: Boolean,
   isAdmin: Boolean,
   tokens: Array,
   profile: {
     name: String,
     gender: String,
-    location: String,
-    website: String,
     department: String,
     position: String,
+    salary: Number,
     address: String,
     picture: String
   }

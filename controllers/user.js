@@ -15,6 +15,7 @@ const randomBytesAsync = promisify(crypto.randomBytes);
  */
 const sendMail = (settings) => {
   let transportConfig;
+
   if (process.env.SENDGRID_API_KEY) {
     transportConfig = nodemailerSendgrid({
       apiKey: process.env.SENDGRID_API_KEY,
@@ -27,6 +28,7 @@ const sendMail = (settings) => {
       },
     };
   }
+
   let transporter = nodemailer.createTransport(transportConfig);
 
   return transporter
@@ -62,6 +64,7 @@ exports.getLogin = (req, res) => {
   if (req.user) {
     return res.redirect('/');
   }
+
   res.render('account/login', {
     title: 'Login',
   });
@@ -73,13 +76,20 @@ exports.getLogin = (req, res) => {
  */
 exports.postLogin = (req, res, next) => {
   const validationErrors = [];
-  if (!validator.isEmail(req.body.email)) { validationErrors.push({ msg: 'Please enter a valid email address.' }); }
-  if (validator.isEmpty(req.body.password)) { validationErrors.push({ msg: 'Password cannot be blank.' }); }
+
+  if (!validator.isEmail(req.body.email)) {
+    validationErrors.push({ msg: 'Please enter a valid email address.' });
+  }
+
+  if (validator.isEmpty(req.body.password)) {
+    validationErrors.push({ msg: 'Password cannot be blank.' });
+  }
 
   if (validationErrors.length) {
     req.flash('errors', validationErrors);
     return res.redirect('/login');
   }
+
   req.body.email = validator.normalizeEmail(req.body.email, {
     gmail_remove_dots: false,
   });
@@ -88,14 +98,17 @@ exports.postLogin = (req, res, next) => {
     if (err) {
       return next(err);
     }
+
     if (!user) {
       req.flash('errors', info);
       return res.redirect('/login');
     }
+
     req.logIn(user, (err) => {
       if (err) {
         return next(err);
       }
+
       req.flash('success', { msg: 'Success! You are logged in.' });
       res.redirect(req.session.returnTo || '/');
     });
@@ -109,7 +122,10 @@ exports.postLogin = (req, res, next) => {
 exports.logout = (req, res) => {
   req.logout();
   req.session.destroy((err) => {
-    if (err) { console.log('Error : Failed to destroy the session during logout.', err); }
+    if (err) {
+      console.log('Error : Failed to destroy the session during logout.', err);
+    }
+
     req.user = null;
     res.redirect('/');
   });
@@ -123,6 +139,7 @@ exports.getSignup = (req, res) => {
   if (req.user) {
     return res.redirect('/');
   }
+
   res.render('account/signup', {
     title: 'Register',
   });
@@ -134,18 +151,24 @@ exports.getSignup = (req, res) => {
  */
 exports.postSignup = (req, res, next) => {
   const validationErrors = [];
-  if (!validator.isEmail(req.body.email)) { validationErrors.push({ msg: 'Please enter a valid email address.' }); }
-  if (!validator.isLength(req.body.password, { min: 8 })) {
-    validationErrors.push({
-      msg: 'Password must be at least 8 characters long',
-    });
+
+  if (!validator.isEmail(req.body.email)) {
+    validationErrors.push({ msg: 'Please enter a valid email address.' });
   }
-  if (req.body.password !== req.body.confirmPassword) { validationErrors.push({ msg: 'Passwords do not match' }); }
+
+  if (!validator.isLength(req.body.password, { min: 8 })) {
+    validationErrors.push({ msg: 'Password must be at least 8 characters long' });
+  }
+
+  if (req.body.password !== req.body.confirmPassword) {
+    validationErrors.push({ msg: 'Passwords do not match' });
+  }
 
   if (validationErrors.length) {
     req.flash('errors', validationErrors);
     return res.redirect('/signup');
   }
+
   req.body.email = validator.normalizeEmail(req.body.email, {
     gmail_remove_dots: false,
   });
@@ -153,36 +176,35 @@ exports.postSignup = (req, res, next) => {
   const user = new User({
     email: req.body.email,
     password: req.body.password,
-    isAdmin: false
+    isAdmin: false,
+    isActive: true
   });
 
   User.findOne({ email: req.body.email }, (err, existingUser) => {
     if (err) {
       return next(err);
     }
+
     if (existingUser) {
       req.flash('errors', {
         msg: 'Account with that email address already exists.',
       });
       return res.redirect('/signup');
     }
+
     user.save((err) => {
       if (err) {
         return next(err);
       }
+
       req.logIn(user, (err) => {
         if (err) {
           return next(err);
         }
+
         res.redirect('/');
       });
     });
-  });
-};
-
-exports.getAllEmployees = (req, res) => {
-  res.render('account/employees', {
-    title: 'Admin Account Management',
   });
 };
 
@@ -202,12 +224,16 @@ exports.getAccount = (req, res) => {
  */
 exports.postUpdateProfile = (req, res, next) => {
   const validationErrors = [];
-  if (!validator.isEmail(req.body.email)) { validationErrors.push({ msg: 'Please enter a valid email address.' }); }
+
+  if (!validator.isEmail(req.body.email)) {
+    validationErrors.push({ msg: 'Please enter a valid email address.' });
+  }
 
   if (validationErrors.length) {
     req.flash('errors', validationErrors);
     return res.redirect('/account');
   }
+
   req.body.email = validator.normalizeEmail(req.body.email, {
     gmail_remove_dots: false,
   });
@@ -216,6 +242,7 @@ exports.postUpdateProfile = (req, res, next) => {
     if (err) {
       return next(err);
     }
+
     if (user.email !== req.body.email) user.emailVerified = false;
     user.email = req.body.email || '';
     user.profile.name = req.body.name || '';
@@ -233,6 +260,7 @@ exports.postUpdateProfile = (req, res, next) => {
         }
         return next(err);
       }
+
       req.flash('success', { msg: 'Profile information has been updated.' });
       res.redirect('/account');
     });
@@ -245,12 +273,14 @@ exports.postUpdateProfile = (req, res, next) => {
  */
 exports.postUpdatePassword = (req, res, next) => {
   const validationErrors = [];
+
   if (!validator.isLength(req.body.password, { min: 8 })) {
-    validationErrors.push({
-      msg: 'Password must be at least 8 characters long',
-    });
+    validationErrors.push({ msg: 'Password must be at least 8 characters long' });
   }
-  if (req.body.password !== req.body.confirmPassword) { validationErrors.push({ msg: 'Passwords do not match' }); }
+
+  if (req.body.password !== req.body.confirmPassword) {
+    validationErrors.push({ msg: 'Passwords do not match' });
+  }
 
   if (validationErrors.length) {
     req.flash('errors', validationErrors);
@@ -261,11 +291,13 @@ exports.postUpdatePassword = (req, res, next) => {
     if (err) {
       return next(err);
     }
+
     user.password = req.body.password;
     user.save((err) => {
       if (err) {
         return next(err);
       }
+
       req.flash('success', { msg: 'Password has been changed.' });
       res.redirect('/account');
     });
@@ -281,6 +313,7 @@ exports.postDeleteAccount = (req, res, next) => {
     if (err) {
       return next(err);
     }
+
     req.logout();
     req.flash('info', { msg: 'Your account has been deleted.' });
     res.redirect('/');
@@ -297,6 +330,7 @@ exports.getOauthUnlink = (req, res, next) => {
     if (err) {
       return next(err);
     }
+
     user[provider.toLowerCase()] = undefined;
     const tokensWithoutProviderToUnlink = user.tokens
       .filter((token) => token.kind !== provider.toLowerCase());
@@ -319,6 +353,7 @@ exports.getOauthUnlink = (req, res, next) => {
       if (err) {
         return next(err);
       }
+
       req.flash('info', {
         msg: `${_.startCase(_.toLower(provider))} account has been unlinked.`,
       });
@@ -335,8 +370,13 @@ exports.getReset = (req, res, next) => {
   if (req.isAuthenticated()) {
     return res.redirect('/');
   }
+
   const validationErrors = [];
-  if (!validator.isHexadecimal(req.params.token)) { validationErrors.push({ msg: 'Invalid Token.  Please retry.' }); }
+
+  if (!validator.isHexadecimal(req.params.token)) {
+    validationErrors.push({ msg: 'Invalid Token.  Please retry.' });
+  }
+
   if (validationErrors.length) {
     req.flash('errors', validationErrors);
     return res.redirect('/forgot');
@@ -349,6 +389,7 @@ exports.getReset = (req, res, next) => {
       if (err) {
         return next(err);
       }
+
       if (!user) {
         req.flash('errors', {
           msg: 'Password reset token is invalid or has expired.',
@@ -372,7 +413,11 @@ exports.getVerifyEmailToken = (req, res, next) => {
   }
 
   const validationErrors = [];
-  if (req.params.token && !validator.isHexadecimal(req.params.token)) { validationErrors.push({ msg: 'Invalid Token.  Please retry.' }); }
+
+  if (req.params.token && !validator.isHexadecimal(req.params.token)) {
+    validationErrors.push({ msg: 'Invalid Token.  Please retry.' });
+  }
+
   if (validationErrors.length) {
     req.flash('errors', validationErrors);
     return res.redirect('/account');
@@ -387,6 +432,7 @@ exports.getVerifyEmailToken = (req, res, next) => {
           });
           return res.redirect('back');
         }
+
         user.emailVerificationToken = '';
         user.emailVerified = true;
         user = user.save();
@@ -396,8 +442,7 @@ exports.getVerifyEmailToken = (req, res, next) => {
         return res.redirect('/account');
       })
       .catch((error) => {
-        console.log('Error saving the user profile to the database after email verification',
-          error);
+        console.log('Error saving the user profile to the database after email verification', error);
         req.flash('errors', {
           msg: 'There was an error when updating your profile.  Please try again later.',
         });
@@ -453,11 +498,9 @@ exports.getVerifyEmail = (req, res, next) => {
     const mailSettings = {
       successfulType: 'info',
       successfulMsg: `An e-mail has been sent to ${req.user.email} with further instructions.`,
-      loggingError:
-        'ERROR: Could not send verifyEmail email after security downgrade.\n',
+      loggingError: 'ERROR: Could not send verifyEmail email after security downgrade.\n',
       errorType: 'errors',
-      errorMsg:
-        'Error sending the email verification message. Please try again shortly.',
+      errorMsg: 'Error sending the email verification message. Please try again shortly.',
       mailOptions,
       req,
     };
@@ -477,13 +520,20 @@ exports.getVerifyEmail = (req, res, next) => {
  */
 exports.postReset = (req, res, next) => {
   const validationErrors = [];
+
   if (!validator.isLength(req.body.password, { min: 8 })) {
     validationErrors.push({
       msg: 'Password must be at least 8 characters long',
     });
   }
-  if (req.body.password !== req.body.confirm) { validationErrors.push({ msg: 'Passwords do not match' }); }
-  if (!validator.isHexadecimal(req.params.token)) { validationErrors.push({ msg: 'Invalid Token.  Please retry.' }); }
+
+  if (req.body.password !== req.body.confirm) {
+    validationErrors.push({ msg: 'Passwords do not match' });
+  }
+
+  if (!validator.isHexadecimal(req.params.token)) {
+    validationErrors.push({ msg: 'Invalid Token.  Please retry.' });
+  }
 
   if (validationErrors.length) {
     req.flash('errors', validationErrors);
@@ -501,6 +551,7 @@ exports.postReset = (req, res, next) => {
           });
           return res.redirect('back');
         }
+
         user.password = req.body.password;
         user.passwordResetToken = undefined;
         user.passwordResetExpires = undefined;
@@ -510,6 +561,7 @@ exports.postReset = (req, res, next) => {
               if (err) {
                 return reject(err);
               }
+
               resolve(user);
             });
           }));
@@ -519,6 +571,7 @@ exports.postReset = (req, res, next) => {
     if (!user) {
       return;
     }
+
     const mailOptions = {
       to: user.email,
       from: 'hackathon@starter.com',
@@ -528,11 +581,9 @@ exports.postReset = (req, res, next) => {
     const mailSettings = {
       successfulType: 'success',
       successfulMsg: 'Success! Your password has been changed.',
-      loggingError:
-        'ERROR: Could not send password reset confirmation email after security downgrade.\n',
+      loggingError: 'ERROR: Could not send password reset confirmation email after security downgrade.\n',
       errorType: 'warning',
-      errorMsg:
-        'Your password has been changed, however we were unable to send you a confirmation email. We will be looking into it shortly.',
+      errorMsg: 'Your password has been changed, however we were unable to send you a confirmation email. We will be looking into it shortly.',
       mailOptions,
       req,
     };
@@ -555,6 +606,7 @@ exports.getForgot = (req, res) => {
   if (req.isAuthenticated()) {
     return res.redirect('/');
   }
+
   res.render('account/forgot', {
     title: 'Forgot Password',
   });
@@ -566,12 +618,16 @@ exports.getForgot = (req, res) => {
  */
 exports.postForgot = (req, res, next) => {
   const validationErrors = [];
-  if (!validator.isEmail(req.body.email)) { validationErrors.push({ msg: 'Please enter a valid email address.' }); }
+
+  if (!validator.isEmail(req.body.email)) {
+    validationErrors.push({ msg: 'Please enter a valid email address.' });
+  }
 
   if (validationErrors.length) {
     req.flash('errors', validationErrors);
     return res.redirect('/forgot');
   }
+
   req.body.email = validator.normalizeEmail(req.body.email, {
     gmail_remove_dots: false,
   });
@@ -590,6 +646,7 @@ exports.postForgot = (req, res, next) => {
         user.passwordResetExpires = Date.now() + 3600000; // 1 hour
         user = user.save();
       }
+
       return user;
     });
 
@@ -597,6 +654,7 @@ exports.postForgot = (req, res, next) => {
     if (!user) {
       return;
     }
+
     const token = user.passwordResetToken;
     const mailOptions = {
       to: user.email,
@@ -610,11 +668,9 @@ exports.postForgot = (req, res, next) => {
     const mailSettings = {
       successfulType: 'info',
       successfulMsg: `An e-mail has been sent to ${user.email} with further instructions.`,
-      loggingError:
-        'ERROR: Could not send forgot password email after security downgrade.\n',
+      loggingError: 'ERROR: Could not send forgot password email after security downgrade.\n',
       errorType: 'errors',
-      errorMsg:
-        'Error sending the password reset message. Please try again shortly.',
+      errorMsg: 'Error sending the password reset message. Please try again shortly.',
       mailOptions,
       req,
     };

@@ -24,7 +24,7 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, don
     if (!user) {
       return done(null, false, { msg: `Email ${email} not found.` });
     }
-    if (user.isDeactivated) {
+    if (!user.isActive) {
       return done(null, false, { msg: 'Your account has been disabled.' });
     }
     if (!user.password) {

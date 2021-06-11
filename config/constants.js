@@ -10,6 +10,7 @@ constants.FORMAT_DAY_NUM = 'E';
 constants.FORMAT_DAY_NAME = 'dddd';
 constants.FORMAT_LOCALE_DAY = 'dddd, DD MMMM YYYY';
 constants.FORMAT_TIME = 'hh:mm:ss A';
+constants.FORMAT_TIME2 = 'hh:mm A';
 constants.LOCALE_ID = 'id';
 constants.LOCALE_TZ = 'Asia/Jakarta';
 

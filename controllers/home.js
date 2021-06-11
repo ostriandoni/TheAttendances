@@ -26,7 +26,7 @@ exports.index = async (req, res, next) => {
       });
       res.render('home', {
         title: 'Home',
-        clock: now.format(constants.FORMAT_TIME),
+        clock: now.format(constants.FORMAT_TIME2),
         day: now.locale(constants.LOCALE_ID).format(constants.FORMAT_LOCALE_DAY),
         user,
         clockIn: clockIn ? moment(clockIn.clockInAt).format(constants.FORMAT_TIME) : null,

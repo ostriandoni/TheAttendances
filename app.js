@@ -16,22 +16,12 @@ const path = require('path');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const sass = require('node-sass-middleware');
+const routes = require('./routes');
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
 dotenv.config({ path: '.env' });
-
-/**
- * Controllers (route handlers).
- */
-const userController = require('./controllers/user');
-const employeeController = require('./controllers/employee');
-
-/**
- * API keys and Passport configuration.
- */
-const passportConfig = require('./config/passport');
 
 /**
  * Create Express server.
@@ -134,31 +124,7 @@ app.use('/webfonts',
 /**
  * Primary app routes.
  */
-app.get('/', userController.dashboard);
-app.get('/login', userController.getLogin);
-app.post('/login', userController.postLogin);
-app.get('/logout', userController.logout);
-app.get('/forgot', userController.getForgot);
-app.post('/forgot', userController.postForgot);
-app.get('/reset/:token', userController.getReset);
-app.post('/reset/:token', userController.postReset);
-app.get('/signup', userController.getSignup);
-app.post('/signup', userController.postSignup);
-app.get('/account/verify', passportConfig.isAuthenticated, userController.getVerifyEmail);
-app.get('/account/verify/:token', passportConfig.isAuthenticated, userController.getVerifyEmailToken);
-app.get('/account', passportConfig.isAuthenticated, userController.getAccount);
-app.post('/account/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);
-app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
-app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
-app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
-app.get('/employees', passportConfig.isAuthenticated, employeeController.getAllEmployees);
-app.get('/employees/:id', passportConfig.isAuthenticated, employeeController.getEmployeeById);
-app.post('/employees/:id', passportConfig.isAuthenticated, employeeController.editEmployeeById);
-app.post('/employees/:id/password', passportConfig.isAuthenticated, employeeController.editEmployeePasswordById);
-app.post('/employees/:id/delete', passportConfig.isAuthenticated, employeeController.deleteEmployeeById);
-app.post('/employees/:id/clockin', passportConfig.isAuthenticated, employeeController.clockIn);
-app.post('/employees/:id/clockout', passportConfig.isAuthenticated, employeeController.clockOut);
-app.get('/employees/:id/attendance', passportConfig.isAuthenticated, employeeController.getEmployeeAttendance);
+app.use(routes);
 
 /**
  * Error Handler.

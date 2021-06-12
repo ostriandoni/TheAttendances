@@ -11,26 +11,22 @@ block content
           tr
             th(scope='col') #
             th(scope='col') Name
-            th(scope='col') Email
             th(scope='col') Department
             th(scope='col') Position
             th(scope='col') Salary
-            th(scope='col') Is Admin
-            th(scope='col') Is Active
+            th(scope='col') Total Attendance
+            th(scope='col') Salary Nett
             th(scope='col') Action
         tbody
           for user in users
             tr
               th(scope='row')= user.idx
               td= user.profile.name
-              td= user.email
               td= user.profile.department
               td= user.profile.position
-              td= user.profile.salary
-              td
-                input(type='checkbox', checked=user.isAdmin ? 'checked' : undefined, readonly)
-              td
-                input(type='checkbox', checked=user.isActive ? 'checked' : undefined, readonly)
+              td= user.salary
+              td= user.totalAttendance
+              td= user.totalSalary
               td
                 a.btn.btn-primary.btn-sm(href=`/employees/${user.id}`, role='button')
                   i.fas.fa-pencil-alt

@@ -4,10 +4,15 @@ block content
   .pb-2.mt-2.mb-4.border-bottom
     h3.text-center Attendance History
   p.lead.text-center #{schedule.month} #{schedule.year}
-  p.text-center Total Kehadiran #{totalAttendance}%
 
   .row
     .col-md-3
+      .card.text-center
+        .card-header
+          | Total Kehadiran
+        .card-body
+          h5.card-title #{totalAttendance}%
+          p.card-text
     .col-md-6
       form(action=`/employees/${user.id}/attendance`, method='GET')
         .row.d-flex.justify-content-center
@@ -56,3 +61,9 @@ block content
               td= log.clock_out
               td= log.remarks
     .col-md-3
+      .card.text-center
+        .card-header
+          | Salary Bulan Ini
+        .card-body
+          h5.card-title #{totalSalary}
+          p.card-text

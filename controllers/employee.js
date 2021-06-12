@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const currency = require('currency.js');
 const moment = require('moment');
 const validator = require('validator');
 const User = require('../models/User');
@@ -12,15 +13,37 @@ class EmployeeController {
       return res.redirect('/');
     }
 
-    let users = [];
+    const users = [];
 
     try {
-      users = await User.find({});
+      const allUsers = await User.find({});
+      const selectedMonthYear = moment().format(constants.FORMAT_YEARMONTH);
       let i = 1;
-      _.map(users, (user) => {
-        _.assign(user, { idx: i });
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const user of allUsers) {
+        // eslint-disable-next-line no-await-in-loop
+        const totalAttendance = await AttendanceController.calculateTotalAttendance({
+          userId: user.id,
+          monthYear: moment(`${selectedMonthYear}-01`).format(constants.FORMAT_YEARMONTH)
+        });
+
+        // eslint-disable-next-line no-await-in-loop
+        const totalSalary = await AttendanceController.calculateSalaryByTotalAttendance({
+          userId: user.id,
+          monthYear: moment(`${selectedMonthYear}-01`).format(constants.FORMAT_YEARMONTH),
+          salary: user.profile.salary
+        });
+
+        _.assign(user, {
+          idx: i,
+          salary: currency(user.profile.salary, constants.LOCALE_CURRENCY).format(),
+          totalAttendance: `${totalAttendance}%`,
+          totalSalary
+        });
+        users.push(user);
         i++;
-      });
+      }
     } catch (error) {
       return next(error);
     }
@@ -251,16 +274,29 @@ class EmployeeController {
         monthYear: moment(`${selectedMonthYear}-01`).format(constants.FORMAT_YEARMONTH)
       });
 
+      const totalSalary = await AttendanceController.calculateSalaryByTotalAttendance({
+        userId,
+        monthYear: moment(`${selectedMonthYear}-01`).format(constants.FORMAT_YEARMONTH),
+        salary: user.profile.salary
+      });
+
       res.render('history', {
         title: 'History',
         schedule: {
           year: query && query.year ? query.year : moment().format(constants.FORMAT_YEAR),
-          month: moment().locale(constants.LOCALE_ID).format(constants.FORMAT_MONTH),
+          month: query && query.month
+            ? moment(`${query.year}-${query.month}-01`)
+              .locale(constants.LOCALE_ID)
+              .format(constants.FORMAT_MONTH)
+            : moment()
+              .locale(constants.LOCALE_ID)
+              .format(constants.FORMAT_MONTH),
           monthNum: query && query.month ? query.month : moment().format(constants.FORMAT_MONTH_PAD)
         },
         user,
         logs,
-        totalAttendance
+        totalAttendance,
+        totalSalary
       });
     } catch (error) {
       return next(error);

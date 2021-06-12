@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const currency = require('currency.js');
 const moment = require('moment');
 const mongoose = require('mongoose');
 const Attendance = require('../models/Attendance');
@@ -8,17 +9,31 @@ class AttendanceController {
   async calculateTotalAttendance(params) {
     const { userId, monthYear } = params;
     const daysInMonth = moment(monthYear, constants.FORMAT_YEARMONTH).daysInMonth();
-    const attendances = await Attendance.find({
+    const attendances = await this.getAttendances(userId, monthYear, daysInMonth);
+    const totalPresence = (_.map(attendances, 'scheduleDate')).length;
+    const workingDays = this.calculateWorkingDays(daysInMonth);
+    const totalAttendance = ((totalPresence / workingDays) * 100).toFixed(2);
+    return totalAttendance;
+  }
+
+  async calculateSalaryByTotalAttendance(params) {
+    const { userId, monthYear, salary } = params;
+    const daysInMonth = moment(monthYear, constants.FORMAT_YEARMONTH).daysInMonth();
+    const attendances = await this.getAttendances(userId, monthYear, daysInMonth);
+    const totalPresence = (_.map(attendances, 'scheduleDate')).length;
+    const workingDays = this.calculateWorkingDays(daysInMonth);
+    const totalSalary = ((totalPresence / workingDays) * salary);
+    return currency(totalSalary, constants.LOCALE_CURRENCY).format();
+  }
+
+  async getAttendances(userId, monthYear, daysInMonth) {
+    return Attendance.find({
       userId: mongoose.Types.ObjectId(userId),
       scheduleDate: {
         $gte: moment(`${monthYear}-01`).format(constants.FORMAT_DATE),
         $lt: moment(`${monthYear}-${daysInMonth}`).format(constants.FORMAT_DATE)
       }
     });
-    const totalPresence = (_.map(attendances, 'scheduleDate')).length;
-    const workingDays = this.calculateWorkingDays(daysInMonth);
-    const totalAttendance = ((totalPresence / workingDays) * 100).toFixed(2);
-    return totalAttendance;
   }
 
   calculateWorkingDays(daysInMonth) {

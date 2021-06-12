@@ -83,6 +83,19 @@ class EmployeeController {
     req.flash('success', { msg: 'Profile information has been updated.' });
     res.redirect('/employees');
   }
+
+  async editEmployeePasswordById(req, res, next) {}
+
+  async deleteEmployeeById(req, res, next) {
+    try {
+      const { params, query } = req;
+      await User.deleteOne({ _id: params.id });
+      req.flash('info', { msg: `${query.empName}'s account has been deleted.` });
+      res.redirect('/employees');
+    } catch (error) {
+      return next(error);
+    }
+  }
 }
 
 module.exports = new EmployeeController();

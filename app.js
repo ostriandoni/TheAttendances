@@ -159,6 +159,8 @@ app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userControl
 app.get('/employees', passportConfig.isAuthenticated, employeeController.getAllEmployees);
 app.get('/employees/:id', passportConfig.isAuthenticated, employeeController.getEmployeeById);
 app.post('/employees/:id', passportConfig.isAuthenticated, employeeController.editEmployeeById);
+app.post('/employees/:id/password', passportConfig.isAuthenticated, employeeController.editEmployeePasswordById);
+app.post('/employees/:id/delete', passportConfig.isAuthenticated, employeeController.deleteEmployeeById);
 
 /**
  * Error Handler.

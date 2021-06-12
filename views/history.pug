@@ -65,5 +65,5 @@ block content
         .card-header
           | Salary Bulan Ini
         .card-body
-          h5.card-title #{totalSalary}
+          h5.card-title= totalSalary === '-RpNaN' ? 'Not set' : totalSalary
           p.card-text

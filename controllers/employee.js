@@ -42,8 +42,10 @@ class EmployeeController {
     const userId = req.params.id;
     const redirectUrl = `/employees/${userId}`;
     const validationErrors = [];
+    let { email } = req.body;
+    email = validator.normalizeEmail(email, { gmail_remove_dots: false });
 
-    if (!validator.isEmail(req.body.email)) {
+    if (!validator.isEmail(email)) {
       validationErrors.push({ msg: 'Please enter a valid email address.' });
     }
 
@@ -52,23 +54,21 @@ class EmployeeController {
       return res.redirect(redirectUrl);
     }
 
-    let { email } = req.body;
     const {
       name, gender, address, department, position, salary, isAdmin, isActive
     } = req.body;
-    email = validator.normalizeEmail(email, { gmail_remove_dots: false });
-    const user = await User.findById(userId);
-    user.email = email || '';
-    user.profile.name = name || '';
-    user.profile.gender = gender || '';
-    user.profile.address = address || '';
-    user.profile.department = department || '';
-    user.profile.position = position || '';
-    user.profile.salary = salary || 0;
-    user.isAdmin = isAdmin === 'on' || isAdmin === '';
-    user.isActive = isActive === 'on' || isActive === '';
 
     try {
+      const user = await User.findById(userId);
+      user.email = email || '';
+      user.profile.name = name || '';
+      user.profile.gender = gender || '';
+      user.profile.address = address || '';
+      user.profile.department = department || '';
+      user.profile.position = position || '';
+      user.profile.salary = salary || 0;
+      user.isAdmin = isAdmin === 'on' || isAdmin === '';
+      user.isActive = isActive === 'on' || isActive === '';
       await user.save();
     } catch (error) {
       if (error.code === 11000) {
@@ -80,21 +80,51 @@ class EmployeeController {
       return next(error);
     }
 
-    req.flash('success', { msg: 'Profile information has been updated.' });
+    req.flash('success', { msg: `${name}'s profile information has been updated.` });
     res.redirect('/employees');
   }
 
-  async editEmployeePasswordById(req, res, next) {}
+  async editEmployeePasswordById(req, res, next) {
+    const userId = req.params.id;
+    const { password, confirmPassword } = req.body;
+    const validationErrors = [];
 
-  async deleteEmployeeById(req, res, next) {
+    if (!validator.isLength(password, { min: 8 })) {
+      validationErrors.push({ msg: 'Password must be at least 8 characters long' });
+    }
+
+    if (password !== confirmPassword) {
+      validationErrors.push({ msg: 'Passwords do not match' });
+    }
+
+    if (validationErrors.length) {
+      req.flash('errors', validationErrors);
+      return res.redirect(`/employees/${userId}`);
+    }
+
     try {
-      const { params, query } = req;
-      await User.deleteOne({ _id: params.id });
-      req.flash('info', { msg: `${query.empName}'s account has been deleted.` });
-      res.redirect('/employees');
+      const user = await User.findById(userId);
+      user.password = password;
+      await user.save();
     } catch (error) {
       return next(error);
     }
+
+    req.flash('success', { msg: 'Password has been changed.' });
+    res.redirect('/employees');
+  }
+
+  async deleteEmployeeById(req, res, next) {
+    const { params, query } = req;
+
+    try {
+      await User.deleteOne({ _id: params.id });
+    } catch (error) {
+      return next(error);
+    }
+
+    req.flash('info', { msg: `${query.empName}'s account has been deleted.` });
+    res.redirect('/employees');
   }
 }
 

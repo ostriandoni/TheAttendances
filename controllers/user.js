@@ -1,8 +1,8 @@
 const _ = require('lodash');
-const moment = require('moment-timezone');
 const { promisify } = require('util');
 const crypto = require('crypto');
 const mailChecker = require('mailchecker');
+const moment = require('moment-timezone');
 const nodemailer = require('nodemailer');
 const nodemailerSendgrid = require('nodemailer-sendgrid');
 const passport = require('passport');

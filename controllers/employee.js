@@ -8,6 +8,10 @@ const constants = require('../config/constants');
 
 class EmployeeController {
   async getAllEmployees(req, res, next) {
+    if (!req.user.isAdmin) {
+      return res.redirect('/');
+    }
+
     let users = [];
 
     try {
@@ -28,6 +32,10 @@ class EmployeeController {
   }
 
   async getEmployeeById(req, res, next) {
+    if (!req.user.isAdmin) {
+      return res.redirect('/');
+    }
+
     let user;
 
     try {

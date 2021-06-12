@@ -25,8 +25,6 @@ dotenv.config({ path: '.env' });
 /**
  * Controllers (route handlers).
  */
-const homeController = require('./controllers/home');
-const historyController = require('./controllers/history');
 const userController = require('./controllers/user');
 const employeeController = require('./controllers/employee');
 
@@ -136,10 +134,7 @@ app.use('/webfonts',
 /**
  * Primary app routes.
  */
-app.get('/', homeController.index);
-app.post('/clockin', passportConfig.isAuthenticated, homeController.postClockIn);
-app.post('/clockout', passportConfig.isAuthenticated, homeController.postClockOut);
-app.get('/history', passportConfig.isAuthenticated, historyController.index);
+app.get('/', userController.dashboard);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);
@@ -161,6 +156,9 @@ app.get('/employees/:id', passportConfig.isAuthenticated, employeeController.get
 app.post('/employees/:id', passportConfig.isAuthenticated, employeeController.editEmployeeById);
 app.post('/employees/:id/password', passportConfig.isAuthenticated, employeeController.editEmployeePasswordById);
 app.post('/employees/:id/delete', passportConfig.isAuthenticated, employeeController.deleteEmployeeById);
+app.post('/employees/:id/clockin', passportConfig.isAuthenticated, employeeController.clockIn);
+app.post('/employees/:id/clockout', passportConfig.isAuthenticated, employeeController.clockOut);
+app.get('/employees/:id/attendance', passportConfig.isAuthenticated, employeeController.getEmployeeAttendance);
 
 /**
  * Error Handler.

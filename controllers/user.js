@@ -1,12 +1,16 @@
+const _ = require('lodash');
+const moment = require('moment-timezone');
 const { promisify } = require('util');
 const crypto = require('crypto');
+const mailChecker = require('mailchecker');
 const nodemailer = require('nodemailer');
 const nodemailerSendgrid = require('nodemailer-sendgrid');
 const passport = require('passport');
-const _ = require('lodash');
 const validator = require('validator');
-const mailChecker = require('mailchecker');
 const User = require('../models/User');
+const Attendance = require('../models/Attendance');
+const AttendanceController = require('./attendance');
+const constants = require('../config/constants');
 
 const randomBytesAsync = promisify(crypto.randomBytes);
 
@@ -54,6 +58,49 @@ const sendMail = (settings) => {
       settings.req.flash(settings.errorType, { msg: settings.errorMsg });
       return err;
     });
+};
+
+/**
+ * GET /
+ * Dashboard page.
+ */
+exports.dashboard = async (req, res, next) => {
+  if (req.user && req.user.id) {
+    try {
+      const userId = req.user.id;
+      const user = await User.findById(userId);
+      const now = moment().tz(constants.LOCALE_TZ);
+      const clockIn = await Attendance.findOne({
+        userId,
+        scheduleDate: moment().format(constants.FORMAT_DATE),
+        clockInAt: { $ne: null }
+      });
+      const clockOut = await Attendance.findOne({
+        userId,
+        scheduleDate: moment().format(constants.FORMAT_DATE),
+        clockOutAt: { $ne: null }
+      });
+      const totalAttendance = await AttendanceController.calculateTotalAttendance({
+        userId,
+        monthYear: moment().format(constants.FORMAT_YEARMONTH)
+      });
+      res.render('home', {
+        title: 'Home',
+        clock: now.format(constants.FORMAT_TIME2),
+        day: now.locale(constants.LOCALE_ID).format(constants.FORMAT_LOCALE_DAY),
+        user,
+        clockIn: clockIn ? moment(clockIn.clockInAt).format(constants.FORMAT_TIME) : null,
+        clockOut: clockOut ? moment(clockOut.clockOutAt).format(constants.FORMAT_TIME) : null,
+        totalAttendance
+      });
+    } catch (error) {
+      return next(error);
+    }
+  } else {
+    res.render('home', {
+      title: 'Home'
+    });
+  }
 };
 
 /**

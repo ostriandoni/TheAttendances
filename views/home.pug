@@ -13,7 +13,7 @@ block content
           .card-body
             h5.card-title #{totalAttendance}%
             p.card-text
-            a.btn.btn-raised(href='/history', role='button')
+            a.btn.btn-raised(href=`/employees/${user.id}/attendance`, role='button')
               i.fas.fa-history
               | History
       .col-md-6
@@ -33,13 +33,13 @@ block content
               p.card-text Clock Out -
             .row
               .col
-                form(action='/clockin', method='POST')
+                form(action=`/employees/${user.id}/clockin`, method='POST')
                   input(type='hidden', name='_csrf', value=_csrf)
                   button.btn.btn-primary.btn-block(type='submit' disabled=clockIn ? 'disabled' : undefined)
                     i.fas.fa-sign-in-alt
                     | Clock In
               .col
-                form(action='/clockout', method='POST')
+                form(action=`/employees/${user.id}/clockout`, method='POST')
                   input(type='hidden', name='_csrf', value=_csrf)
                   button.btn.btn-primary.btn-block(type='submit' disabled=clockOut ? 'disabled' : undefined)
                     i.fas.fa-sign-out-alt

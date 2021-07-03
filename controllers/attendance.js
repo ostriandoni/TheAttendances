@@ -6,8 +6,7 @@ const Attendance = require('../models/Attendance');
 const constants = require('../config/constants');
 
 class AttendanceController {
-  async calculateTotalAttendance(params) {
-    const { userId, monthYear } = params;
+  async calculateTotalAttendance(userId, monthYear) {
     const daysInMonth = moment(monthYear, constants.FORMAT_YEARMONTH).daysInMonth();
     const attendances = await this.getAttendances(userId, monthYear, daysInMonth);
     const totalPresence = (_.map(attendances, 'scheduleDate')).length;
@@ -16,8 +15,7 @@ class AttendanceController {
     return totalAttendance;
   }
 
-  async calculateSalaryByTotalAttendance(params) {
-    const { userId, monthYear, salary } = params;
+  async calculateSalaryByTotalAttendance(userId, monthYear, salary) {
     const daysInMonth = moment(monthYear, constants.FORMAT_YEARMONTH).daysInMonth();
     const attendances = await this.getAttendances(userId, monthYear, daysInMonth);
     const totalPresence = (_.map(attendances, 'scheduleDate')).length;

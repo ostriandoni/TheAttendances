@@ -80,10 +80,8 @@ exports.dashboard = async (req, res, next) => {
         scheduleDate: moment().format(constants.FORMAT_DATE),
         clockOutAt: { $ne: null }
       });
-      const totalAttendance = await AttendanceController.calculateTotalAttendance({
-        userId,
-        monthYear: moment().format(constants.FORMAT_YEARMONTH)
-      });
+      const totalAttendance = await AttendanceController.calculateTotalAttendance(userId,
+        moment().format(constants.FORMAT_YEARMONTH));
       res.render('home', {
         title: 'Home',
         clock: now.format(constants.FORMAT_TIME2),

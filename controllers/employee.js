@@ -23,17 +23,13 @@ class EmployeeController {
       // eslint-disable-next-line no-restricted-syntax
       for (const user of allUsers) {
         // eslint-disable-next-line no-await-in-loop
-        const totalAttendance = await AttendanceController.calculateTotalAttendance({
-          userId: user.id,
-          monthYear: moment(`${selectedMonthYear}-01`).format(constants.FORMAT_YEARMONTH)
-        });
+        const totalAttendance = await AttendanceController.calculateTotalAttendance(user.id,
+          moment(`${selectedMonthYear}-01`).format(constants.FORMAT_YEARMONTH));
 
         // eslint-disable-next-line no-await-in-loop
-        const totalSalary = await AttendanceController.calculateSalaryByTotalAttendance({
-          userId: user.id,
-          monthYear: moment(`${selectedMonthYear}-01`).format(constants.FORMAT_YEARMONTH),
-          salary: user.profile.salary
-        });
+        const totalSalary = await AttendanceController.calculateSalaryByTotalAttendance(user.id,
+          moment(`${selectedMonthYear}-01`).format(constants.FORMAT_YEARMONTH),
+          user.profile.salary);
 
         _.assign(user, {
           idx: i,
@@ -269,16 +265,12 @@ class EmployeeController {
         return result;
       }, {});
 
-      const totalAttendance = await AttendanceController.calculateTotalAttendance({
-        userId,
-        monthYear: moment(`${selectedMonthYear}-01`).format(constants.FORMAT_YEARMONTH)
-      });
+      const totalAttendance = await AttendanceController.calculateTotalAttendance(userId,
+        moment(`${selectedMonthYear}-01`).format(constants.FORMAT_YEARMONTH));
 
-      const totalSalary = await AttendanceController.calculateSalaryByTotalAttendance({
-        userId,
-        monthYear: moment(`${selectedMonthYear}-01`).format(constants.FORMAT_YEARMONTH),
-        salary: user.profile.salary
-      });
+      const totalSalary = await AttendanceController.calculateSalaryByTotalAttendance(userId,
+        moment(`${selectedMonthYear}-01`).format(constants.FORMAT_YEARMONTH),
+        user.profile.salary);
 
       res.render('history', {
         title: 'History',

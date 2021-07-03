@@ -9,6 +9,5 @@ router.get('/verify/:token', userController.getVerifyEmailToken);
 router.post('/profile', userController.postUpdateProfile);
 router.post('/password', userController.postUpdatePassword);
 router.post('/delete', userController.postDeleteAccount);
-router.get('/unlink/:provider', userController.getOauthUnlink);
 
 module.exports = router;

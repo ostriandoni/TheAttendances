@@ -87,8 +87,12 @@ exports.dashboard = async (req, res, next) => {
         clock: now.format(constants.FORMAT_TIME2),
         day: now.locale(constants.LOCALE_ID).format(constants.FORMAT_LOCALE_DAY),
         user,
-        clockIn: clockIn ? moment(clockIn.clockInAt).format(constants.FORMAT_TIME) : null,
-        clockOut: clockOut ? moment(clockOut.clockOutAt).format(constants.FORMAT_TIME) : null,
+        clockIn: clockIn
+          ? moment(clockIn.clockInAt).tz(constants.LOCALE_TZ).format(constants.FORMAT_TIME)
+          : null,
+        clockOut: clockOut
+          ? moment(clockOut.clockOutAt).tz(constants.LOCALE_TZ).format(constants.FORMAT_TIME)
+          : null,
         totalAttendance
       });
     } catch (error) {

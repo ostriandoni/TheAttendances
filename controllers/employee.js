@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const currency = require('currency.js');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const validator = require('validator');
 const User = require('../models/User');
 const Attendance = require('../models/Attendance');
@@ -250,8 +250,12 @@ class EmployeeController {
       _.reduce(logs, (result, value) => {
         const temp = _.find(attendances, (attendance) =>
           moment(attendance.scheduleDate).format(constants.FORMAT_DATE) === value.attendance_date);
-        value.clock_in = temp ? moment(temp.clockInAt).format(constants.FORMAT_TIME) : null;
-        value.clock_out = temp ? moment(temp.clockOutAt).format(constants.FORMAT_TIME) : null;
+        value.clock_in = temp
+          ? moment(temp.clockInAt).tz(constants.LOCALE_TZ).format(constants.FORMAT_TIME)
+          : null;
+        value.clock_out = temp
+          ? moment(temp.clockOutAt).tz(constants.LOCALE_TZ).format(constants.FORMAT_TIME)
+          : null;
         value.remarks = temp || temp ? 'Hadir' : 'Tanpa keterangan';
 
         if (moment().isBefore(value.attendance_date)) {

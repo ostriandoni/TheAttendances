@@ -80,14 +80,18 @@ class EmployeeController {
       validationErrors.push({ msg: 'Please enter a valid email address.' });
     }
 
+    const {
+      name, gender, address, department, position, salary, isAdmin, isActive
+    } = req.body;
+
+    if (salary <= 0) {
+      validationErrors.push({ msg: 'Salary value must be greater than 0.' });
+    }
+
     if (validationErrors.length) {
       req.flash('errors', validationErrors);
       return res.redirect(redirectUrl);
     }
-
-    const {
-      name, gender, address, department, position, salary, isAdmin, isActive
-    } = req.body;
 
     try {
       const user = await User.findById(userId);

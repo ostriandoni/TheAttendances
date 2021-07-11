@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const { promisify } = require('util');
 const crypto = require('crypto');
 const mailChecker = require('mailchecker');
@@ -69,6 +68,7 @@ exports.dashboard = async (req, res, next) => {
     try {
       const userId = req.user.id;
       const user = await User.findById(userId);
+      const [username] = user.email.split('@');
       const now = moment().tz(constants.LOCALE_TZ);
       const clockIn = await Attendance.findOne({
         userId,
@@ -87,6 +87,7 @@ exports.dashboard = async (req, res, next) => {
         clock: now.format(constants.FORMAT_TIME2),
         day: now.locale(constants.LOCALE_ID).format(constants.FORMAT_LOCALE_DAY),
         user,
+        username: user && user.profile && user.profile.name ? user.profile.name : username,
         clockIn: clockIn
           ? moment(clockIn.clockInAt).tz(constants.LOCALE_TZ).format(constants.FORMAT_TIME)
           : null,

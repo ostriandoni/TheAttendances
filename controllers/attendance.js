@@ -9,7 +9,9 @@ class AttendanceController {
   async calculateTotalAttendance(userId, monthYear) {
     const daysInMonth = moment(monthYear, constants.FORMAT_YEARMONTH).daysInMonth();
     const attendances = await this.getAttendances(userId, monthYear, daysInMonth);
-    const totalPresence = (_.map(attendances, 'scheduleDate')).length;
+    const filteredAttendances = attendances.filter((attendance) =>
+      !_.includes(['6', '7'], moment(attendance.scheduleDate).format(constants.FORMAT_DAY_NUM)));
+    const totalPresence = (_.map(filteredAttendances, 'scheduleDate')).length;
     const workingDays = this.calculateWorkingDays(daysInMonth);
     const totalAttendance = ((totalPresence / workingDays) * 100).toFixed(2);
     return totalAttendance;

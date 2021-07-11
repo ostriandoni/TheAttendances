@@ -41,7 +41,7 @@ block content
               .col
                 form(action=`/employees/${user.id}/clockout`, method='POST')
                   input(type='hidden', name='_csrf', value=_csrf)
-                  button.btn.btn-primary.btn-block(type='submit' disabled=clockOut ? 'disabled' : undefined)
+                  button.btn.btn-primary.btn-block(type='submit' disabled=!clockIn || clockOut ? 'disabled' : undefined)
                     i.fas.fa-sign-out-alt
                     | Clock Out
       .col-md-3.text-center

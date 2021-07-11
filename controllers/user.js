@@ -199,7 +199,7 @@ exports.getSignup = (req, res) => {
  * POST /signup
  * Create a new local account.
  */
-exports.postSignup = (req, res, next) => {
+exports.postSignup = async (req, res, next) => {
   const validationErrors = [];
 
   if (!validator.isEmail(req.body.email)) {
@@ -223,10 +223,11 @@ exports.postSignup = (req, res, next) => {
     gmail_remove_dots: false,
   });
 
+  const userCount = await User.count();
   const user = new User({
     email: req.body.email,
     password: req.body.password,
-    isAdmin: false,
+    isAdmin: userCount === 0,
     isActive: true
   });
 

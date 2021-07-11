@@ -63,9 +63,12 @@ class EmployeeController {
       return next(error);
     }
 
+    const [username] = user.email.split('@');
+
     res.render('account/employee', {
       title: 'Edit Employee',
-      employee: user
+      employee: user,
+      username: user && user.profile && user.profile.name ? user.profile.name : username,
     });
   }
 

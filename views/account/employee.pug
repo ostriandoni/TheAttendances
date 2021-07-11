@@ -76,11 +76,11 @@ block content
   .pb-2.mt-2.mb-4.border-bottom
     h3 Delete Account
 
-  form(action=`/employees/${employee.id}/delete?empName=${employee.profile.name}`, method='POST', onsubmit="return confirm('Are you sure you want to delete your account?');")
+  form(action=`/employees/${employee.id}/delete?empName=${username}`, method='POST', onsubmit="return confirm('Are you sure you want to delete this account?');")
     .form-group
-      p.offset-sm-3.col-md-7.pl-2 You can delete #{employee.profile.name}'s account, but keep in mind this action is irreversible.
+      p.offset-sm-3.col-md-7.pl-2 You can delete #{username}'s account, but keep in mind this action is irreversible.
       input(type='hidden', name='_csrf', value=_csrf)
       .offset-sm-3.col-md-7.pl-2
         button.btn.btn-danger(type='submit')
           i.fas.fa-trash-alt.fa-sm
-          | Delete account
+          | Delete Account
